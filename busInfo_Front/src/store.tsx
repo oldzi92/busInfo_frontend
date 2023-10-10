@@ -16,17 +16,32 @@ export type TTimetable = {
   vehicleId: number;
 };
 
+export type TTimetableSingleItem = {
+  busId: number;
+  headsign: string;
+  theoreticalTime: number;
+  estimatedTime: number;
+  delayInSeconds: number;
+};
+
+export interface IBus {
+  busId: number;
+  headsign: string;
+}
+
 export interface Stop {
   selectedStop: string;
   stopsList: string[];
   singleStop: string | number[];
   timetable: TTimetable[];
   stopName: string;
+  addedItems: string[];
 
   setSelectedStop: (stop: string) => void;
   setStopsList: (newStopsList: string[]) => void;
   setSingleStop: (stopName: string) => void;
   setTimetable: (singleTimeTable: TTimetable[]) => void;
+  addToFavorite: (singleStopName: string) => void;
 }
 
 export interface StopsReceiveType {
@@ -54,5 +69,27 @@ export const useStopStore = create<Stop>((set) => ({
 
   setTimetable: (timetable) => {
     set(() => ({ timetable: timetable }));
+  },
+  // locale storage dla ulubionych
+  addedItems: JSON.parse(localStorage.getItem("favoriteStops") || "[]"),
+  addToFavorite: (stopName) => {
+    set((state) => {
+      // Sprawdź, czy stopName jest już w ulubionych
+      const isAlreadyAdded = state.addedItems.includes(stopName);
+
+      // Jeśli nie jest dodany, dodaj go do ulubionych
+      if (!isAlreadyAdded) {
+        const newValues = [...state.addedItems, stopName];
+        localStorage.setItem("favoriteStops", JSON.stringify(newValues));
+        return { addedItems: newValues };
+      }
+
+      // Jeśli jest już dodany, usuń go z ulubionych
+      const filteredValues = state.addedItems.filter(
+        (item) => item !== stopName
+      );
+      localStorage.setItem("favoriteStops", JSON.stringify(filteredValues));
+      return { addedItems: filteredValues };
+    });
   },
 }));
