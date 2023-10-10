@@ -1,6 +1,3 @@
-//moje problemy:
-// dodawanie do ulubionych (stop jest ciagle undefined)
-
 import "./App.css";
 import "@picocss/pico";
 import { io } from "socket.io-client";
